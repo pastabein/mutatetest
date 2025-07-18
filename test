@@ -1,0 +1,165 @@
+-- Roblox Pet Mutate/Duplicator GUI Script
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local TweenService = game:GetService("TweenService")
+
+-- Create main screen GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PetMutateGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Make main frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 250, 0, 150)
+mainFrame.Position = UDim2.new(0.35, 0, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.BackgroundTransparency = 0.1
+mainFrame.Parent = screenGui
+
+-- Make draggable
+local dragScript = Instance.new("LocalScript", mainFrame)
+dragScript.Source = [[
+	local UIS = game:GetService("UserInputService")
+	local frame = script.Parent
+
+	local dragging = false
+	local dragInput, mousePos, framePos
+
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = true
+			mousePos = input.Position
+			framePos = frame.Position
+
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+
+	UIS.InputChanged:Connect(function(input)
+		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+			local delta = input.Position - mousePos
+			frame.Position = UDim2.new(
+				framePos.X.Scale,
+				framePos.X.Offset + delta.X,
+				framePos.Y.Scale,
+				framePos.Y.Offset + delta.Y
+			)
+		end
+	end)
+]]
+
+-- Title label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 30)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "PET MUTATE / DUPLICATOR"
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 16
+titleLabel.TextColor3 = Color3.fromRGB(255, 70, 70)
+titleLabel.Parent = mainFrame
+
+-- Instruction label
+local petLabel = Instance.new("TextLabel")
+petLabel.Size = UDim2.new(1, 0, 0, 20)
+petLabel.Position = UDim2.new(0, 0, 0, 30)
+petLabel.BackgroundTransparency = 1
+petLabel.Text = "PLEASE HOLD THE PET"
+petLabel.Font = Enum.Font.Gotham
+tetLabel.TextSize = 14
+petLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+petLabel.Parent = mainFrame
+
+-- Main button
+local actionBtn = Instance.new("TextButton")
+actionBtn.Size = UDim2.new(0.8, 0, 0, 35)
+actionBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
+actionBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+actionBtn.Text = "MUTATE / DUPE"
+actionBtn.TextColor3 = Color3.new(1,1,1)
+actionBtn.Font = Enum.Font.GothamBold
+actionBtn.TextSize = 16
+actionBtn.Parent = mainFrame
+
+-- Choice Frame
+local choiceFrame = Instance.new("Frame")
+choiceFrame.Size = UDim2.new(0, 200, 0, 120)
+choiceFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+choiceFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+choiceFrame.Visible = false
+choiceFrame.Parent = screenGui
+
+local choiceLabel = Instance.new("TextLabel")
+choiceLabel.Size = UDim2.new(1, 0, 0, 30)
+choiceLabel.Text = "Choose Action"
+choiceLabel.BackgroundTransparency = 1
+choiceLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+choiceLabel.Font = Enum.Font.GothamBold
+choiceLabel.TextSize = 16
+choiceLabel.Parent = choiceFrame
+
+local mutateBtn = Instance.new("TextButton")
+mutateBtn.Size = UDim2.new(0.8, 0, 0, 30)
+mutateBtn.Position = UDim2.new(0.1, 0, 0.4, 0)
+mutateBtn.Text = "MUTATE"
+mutateBtn.Font = Enum.Font.Gotham
+tmutateBtn.TextSize = 14
+mutateBtn.TextColor3 = Color3.new(1,1,1)
+mutateBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+mutateBtn.Parent = choiceFrame
+
+local dupeBtn = mutateBtn:Clone()
+dupeBtn.Text = "DUPLICATE"
+dupeBtn.Position = UDim2.new(0.1, 0, 0.7, 0)
+dupeBtn.Parent = choiceFrame
+
+-- Loading Frame
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.new(0, 220, 0, 30)
+loadingFrame.Position = UDim2.new(0.5, -110, 0.5, -15)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+loadingFrame.Visible = false
+loadingFrame.Parent = screenGui
+
+local progressBar = Instance.new("Frame")
+progressBar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.Parent = loadingFrame
+
+-- Success Message
+local successLabel = Instance.new("TextLabel")
+successLabel.Size = UDim2.new(0, 300, 0, 50)
+successLabel.Position = UDim2.new(0.5, -150, 0.5, 50)
+successLabel.BackgroundColor3 = Color3.fromRGB(20, 80, 20)
+successLabel.Text = "Pet successfully mutated. Kindly check your inventory"
+successLabel.TextColor3 = Color3.new(1,1,1)
+successLabel.Font = Enum.Font.GothamBold
+successLabel.TextSize = 14
+successLabel.Visible = false
+successLabel.Parent = screenGui
+
+-- Button connections
+actionBtn.MouseButton1Click:Connect(function()
+	choiceFrame.Visible = true
+end)
+
+local function startLoading()
+	choiceFrame.Visible = false
+	loadingFrame.Visible = true
+	progressBar.Size = UDim2.new(0, 0, 1, 0)
+
+	TweenService:Create(progressBar, TweenInfo.new(4), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+	wait(4)
+	loadingFrame.Visible = false
+	successLabel.Visible = true
+end
+
+mutateBtn.MouseButton1Click:Connect(startLoading)
+dupeBtn.MouseButton1Click:Connect(startLoading)
