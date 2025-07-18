@@ -1,95 +1,150 @@
---// Pet Mutator/Duplicator GUI (Gray Minimal Design)
-
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Clear old GUI
-if playerGui:FindFirstChild("PetMutateGui") then
-	playerGui:FindFirstChild("PetMutateGui"):Destroy()
+-- Remove previous GUI if exists
+if playerGui:FindFirstChild("MutateUI") then
+	playerGui:FindFirstChild("MutateUI"):Destroy()
 end
 
 local TweenService = game:GetService("TweenService")
 
--- ScreenGui
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "PetMutateGui"
-screenGui.ResetOnSpawn = false
+-- === MAIN GUI ===
+local mainGui = Instance.new("ScreenGui", playerGui)
+mainGui.Name = "MutateUI"
+mainGui.ResetOnSpawn = false
 
--- Main Frame
-local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 400, 0, 200)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
-mainFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+local mainFrame = Instance.new("Frame", mainGui)
+mainFrame.Size = UDim2.new(0, 320, 0, 220)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -110)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
 mainFrame.Draggable = true
 
--- Title
+local UICorner = Instance.new("UICorner", mainFrame)
+UICorner.CornerRadius = UDim.new(0, 10)
+
 local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(1, 0, 0.2, 0)
+title.Size = UDim2.new(1, 0, 0, 40)
 title.Position = UDim2.new(0, 0, 0, 0)
+title.Text = "PET MUTATE / DUPLICATOR"
 title.BackgroundTransparency = 1
-title.Text = "PET MUTATOR SYSTEM"
-title.Font = Enum.Font.SourceSansBold
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
 
--- Action Button (Mutate/Duplicate)
-local actionBtn = Instance.new("TextButton", mainFrame)
-actionBtn.Size = UDim2.new(0.7, 0, 0.25, 0)
-actionBtn.Position = UDim2.new(0.15, 0, 0.35, 0)
-actionBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
-actionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-actionBtn.Font = Enum.Font.SourceSans
-actionBtn.Text = "Mutate / Duplicate"
-actionBtn.TextScaled = true
-actionBtn.BorderSizePixel = 0
-actionBtn.AutoButtonColor = false
+local subtitle = Instance.new("TextLabel", mainFrame)
+subtitle.Size = UDim2.new(1, 0, 0, 20)
+subtitle.Position = UDim2.new(0, 0, 0, 40)
+subtitle.Text = "PLEASE HOLD THE PET"
+subtitle.BackgroundTransparency = 1
+subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+subtitle.Font = Enum.Font.Gotham
+subtitle.TextSize = 14
 
--- Loading Bar
-local loadingBar = Instance.new("Frame", mainFrame)
-loadingBar.Size = UDim2.new(0.7, 0, 0.05, 0)
-loadingBar.Position = UDim2.new(0.15, 0, 0.65, 0)
-loadingBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-loadingBar.BorderSizePixel = 0
-loadingBar.Visible = false
+local mutateButton = Instance.new("TextButton", mainFrame)
+mutateButton.Size = UDim2.new(0.8, 0, 0, 40)
+mutateButton.Position = UDim2.new(0.1, 0, 0.5, -20)
+mutateButton.Text = "MUTATE / DUPE"
+mutateButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+mutateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+mutateButton.Font = Enum.Font.GothamBold
+mutateButton.TextSize = 16
+Instance.new("UICorner", mutateButton).CornerRadius = UDim.new(0, 8)
 
-local progress = Instance.new("Frame", loadingBar)
-progress.Size = UDim2.new(0, 0, 1, 0)
-progress.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
-progress.BorderSizePixel = 0
+-- === CHOOSE ACTION PANEL ===
+local actionFrame = Instance.new("Frame", mainGui)
+actionFrame.Size = UDim2.new(0, 280, 0, 160)
+actionFrame.Position = UDim2.new(0.5, -140, 0.5, -80)
+actionFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+actionFrame.Visible = false
+Instance.new("UICorner", actionFrame).CornerRadius = UDim.new(0, 10)
 
--- Success Message
-local successMsg = Instance.new("TextLabel", mainFrame)
-successMsg.Size = UDim2.new(1, 0, 0.2, 0)
-successMsg.Position = UDim2.new(0, 0, 0.8, 0)
-successMsg.BackgroundTransparency = 1
-successMsg.TextColor3 = Color3.fromRGB(0, 255, 0)
-successMsg.Font = Enum.Font.SourceSansBold
-successMsg.Text = ""
-successMsg.TextScaled = true
+local actionTitle = Instance.new("TextLabel", actionFrame)
+actionTitle.Size = UDim2.new(1, 0, 0, 40)
+actionTitle.Text = "Choose Action"
+actionTitle.BackgroundTransparency = 1
+actionTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+actionTitle.Font = Enum.Font.GothamBold
+actionTitle.TextSize = 18
 
--- Function to simulate 4-min loading
+local mutate = Instance.new("TextButton", actionFrame)
+mutate.Size = UDim2.new(0.8, 0, 0, 30)
+mutate.Position = UDim2.new(0.1, 0, 0.4, 0)
+mutate.Text = "MUTATE"
+mutate.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+mutate.TextColor3 = Color3.fromRGB(255, 255, 255)
+mutate.Font = Enum.Font.GothamBold
+mutate.TextSize = 16
+Instance.new("UICorner", mutate).CornerRadius = UDim.new(0, 8)
+
+local duplicate = mutate:Clone()
+duplicate.Parent = actionFrame
+duplicate.Position = UDim2.new(0.1, 0, 0.65, 0)
+duplicate.Text = "DUPLICATE"
+
+-- === LOADING PANEL ===
+local loadingFrame = Instance.new("Frame", mainGui)
+loadingFrame.Size = UDim2.new(0, 300, 0, 80)
+loadingFrame.Position = UDim2.new(0.5, -150, 0.5, -40)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+loadingFrame.Visible = false
+Instance.new("UICorner", loadingFrame).CornerRadius = UDim.new(0, 10)
+
+local progressBarBg = Instance.new("Frame", loadingFrame)
+progressBarBg.Size = UDim2.new(0.9, 0, 0, 20)
+progressBarBg.Position = UDim2.new(0.05, 0, 0.4, 0)
+progressBarBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Instance.new("UICorner", progressBarBg).CornerRadius = UDim.new(0, 6)
+
+local progressBar = Instance.new("Frame", progressBarBg)
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+Instance.new("UICorner", progressBar).CornerRadius = UDim.new(0, 6)
+progressBar.Parent = progressBarBg
+
+local percentLabel = Instance.new("TextLabel", loadingFrame)
+percentLabel.Size = UDim2.new(1, 0, 0, 30)
+percentLabel.Position = UDim2.new(0, 0, 0, 10)
+percentLabel.BackgroundTransparency = 1
+percentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+percentLabel.Font = Enum.Font.GothamBold
+percentLabel.TextSize = 16
+percentLabel.Text = "Mutating... 0%"
+
+-- === SUCCESS PANEL ===
+local successFrame = loadingFrame:Clone()
+successFrame.Parent = mainGui
+successFrame.Visible = false
+successFrame:FindFirstChildOfClass("TextLabel").Text = "✅ Pet successfully mutated. Kindly check your inventory"
+successFrame:FindFirstChildOfClass("TextLabel").TextColor3 = Color3.fromRGB(0, 255, 0)
+successFrame:FindFirstChild("Frame"):Destroy()
+
+-- === FUNCTIONALITY ===
+mutateButton.MouseButton1Click:Connect(function()
+	actionFrame.Visible = true
+end)
+
 local function startMutation()
-	actionBtn.Text = "Processing..."
-	actionBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-	actionBtn.AutoButtonColor = false
-	actionBtn.Active = false
+	actionFrame.Visible = false
+	loadingFrame.Visible = true
+	mutateButton.Text = "Processing..."
+	mutateButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+	mutateButton.AutoButtonColor = false
+	mutateButton.Active = false
 
-	loadingBar.Visible = true
-	progress.Size = UDim2.new(0, 0, 1, 0)
+	-- 4 minutes loading
+	local duration = 240
+	for i = 1, 100 do
+		local pct = i
+		percentLabel.Text = "Mutating... " .. pct .. "%"
+		progressBar:TweenSize(UDim2.new(i / 100, 0, 1, 0), "Out", "Linear", 0.1, true)
+		wait(duration / 100)
+	end
 
-	-- Tween loading bar over 240 seconds
-	local tween = TweenService:Create(progress, TweenInfo.new(240), {
-		Size = UDim2.new(1, 0, 1, 0)
-	})
-	tween:Play()
-
-	tween.Completed:Connect(function()
-		loadingBar.Visible = false
-		successMsg.Text = "✅ Pet successfully mutated. Kindly check your inventory"
-	end)
+	loadingFrame.Visible = false
+	successFrame.Visible = true
 end
 
--- Connect button
-actionBtn.MouseButton1Click:Connect(startMutation)
+mutate.MouseButton1Click:Connect(startMutation)
+duplicate.MouseButton1Click:Connect(startMutation)
